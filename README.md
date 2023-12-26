@@ -15,7 +15,7 @@ Created by: Trenton Cook
 
 ## Introduction
 
-SwiftSetup is a custom made solution for guiding users through first time login and setup after a SetupYourMac run (https://github.com/dan-snelson/Setup-Your-Mac)
+SwiftSetup is a custom made solution for guiding users through first time login and setup after enrollment (SetupYourMac in this example https://github.com/setup-your-mac/Setup-Your-Mac)
 
 ## Features
 
