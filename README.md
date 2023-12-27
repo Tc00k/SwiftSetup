@@ -11,7 +11,7 @@ Created by: Trenton Cook
   - [Building Setup Assistants](#building-setup-assistants)
   - [Cancellation Message](#cancellation-message)
 - [Creating Multiple Setup Assistants](#creating-multiple-setup-assistants)
-
+- [Demonstration](#demonstration)
 
 ## Introduction
 
@@ -113,4 +113,24 @@ If you already have one Setup Assistant created and running smoothly, adding a s
 7. Copy the ## Display Results section from your new plist creation script (lines 144 & 145) and add it to your original plist creation script
 8. Save your original script with all the changes and reupload it to JAMF
 9. When it is ran at enrollment it will now install plists for both your Setup Assistants and adjust the permissions
-  
+
+
+## Demonstration
+
+Below is an example of what SwiftSetup looks like when launching from the users perspective
+
+- User finishes their enrollment (and in our case a SetupYourMac run)
+- User launches Application that has Setup Assistant attached
+
+![Screenshot 2023-12-27 at 10 04 35 AM](https://github.com/Tc00k/SwiftSetup/assets/150291395/4e3e2407-577e-47b2-b417-20be8014ecb4)
+
+- User selects "No"
+
+![Screenshot 2023-12-27 at 10 05 53 AM](https://github.com/Tc00k/SwiftSetup/assets/150291395/7291ff83-4eb0-4bdf-99b4-942d4101494f)
+
+- User selects "Yes"
+
+![Screenshot 2023-12-27 at 10 02 46 AM](https://github.com/Tc00k/SwiftSetup/assets/150291395/ca09ddec-a9c1-4ef3-8fa9-b13b3e22d1f5)
+
+
+
