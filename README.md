@@ -12,6 +12,7 @@ Created by: Trenton Cook
   - [Cancellation Message](#cancellation-message)
 - [Creating Multiple Setup Assistants](#creating-multiple-setup-assistants)
 - [Demonstration](#demonstration)
+- [Uploading Final Version](#uploading-final-version)
 
 ## Introduction
 
@@ -133,4 +134,27 @@ Below is an example of what SwiftSetup looks like when launching from the users 
 ![Screenshot 2023-12-27 at 10 02 46 AM](https://github.com/Tc00k/SwiftSetup/assets/150291395/ca09ddec-a9c1-4ef3-8fa9-b13b3e22d1f5)
 
 
+## Uploading Final Version
 
+Got your Setup Assistants all done and tested? You'll need to package your /Applications/SwiftSetup folder and upload it to JAMF. The policies will all work as you test them on your machine since you have the images available, however if you start pushing these policies without deploying the SwiftSetup folder as a package end users will start the setup assistants and have no images. Follow the steps below to finalize your SwiftSetup instance.
+
+### Prerequisites
+
+Make sure you have:
+
+  - Setup Assistant policies uploaded to Jamf, scoped, and configured correctly
+  - The combined and finalized Plist Creation policy uploaded to Jamf, scoped, and configured correctly
+  - A completed /Applications/SwiftSetup folder that includes all setup assistant and log directories, and the images to go along with your Setup Assistants in their resources directory
+
+### Last Steps
+
+1. Using Composer or a similar application package the entire /Applications/SwiftSetup folder
+2. Upload this package to your Jamf environment
+3. Create a new policy and select the "Packages" tab, attach your SwiftSetup package to this policy
+4. Scope the policy to all machines that will be utilizing SwiftSetup
+5. Attach the package to your SetupYourMac instance (Like us) or deploy it via your enrollment method
+6. When users enroll they should now, Install SwiftSetup in /Applications/SwiftSetup, install the watch Plists for the applications specified, and receive the Setup Assistant prompts on first time launch of applications
+
+## Contact Me
+
+Having issues with setting up or understanding SwiftSetup? Check my contact information on [My GitHub Page](https://www.GitHub.com/Tc00k) and feel free to reach out to me in whatever way is easiest, I will admit I'll most likely be more responsive in the MacAdmins Slack channel though.
