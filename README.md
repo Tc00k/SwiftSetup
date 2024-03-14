@@ -34,17 +34,17 @@ Make sure you have the following:
 
 - Jamf Instance with the target computer(s) added
 - SwiftDialog installed on the target computer(s) (https://github.com/swiftDialog/swiftDialog)
-- The SwiftSetup_Builder.pkg installed on your machine
+- The assistant_builder.bash script installed on your machine
 
 ### Building Setup Assistants
 
-1. Open your Applications folder and navigate to the SwiftSetup_Builder folder
-2. Run assistant_builder as sudo
-3. When/if prompted to build the SwiftSetup folder select "Yes"
-4. Find the PID name of the process you are building a setup assistant for (pgrep -l "Process Name" in terminal)
-5. Enter a Name for the Setup Assistant in the first field and the PID Name for that application in the second field, be sure to limit the first field to one word. Ex. "MicrosoftOutlook" | "CiscoWebex" and not "Microsoft Outlook" | "Cisco Webex"
-6. Double check that the SwiftSetup folder has been created correctly in /Applications
-7. Double check that there is a Log folder and Setup Assistant folder for your new Setup Assistant in /Applications/SwiftSetup
+1. Run assistant_builder.bash as sudo
+2. When/if prompted to build the SwiftSetup folder select "Yes"
+3. Find the PID name of the process you are building a setup assistant for (pgrep -l "Process Name" in terminal)
+4. Enter a Name for the Setup Assistant in the first field and the PID Name for that application in the second field, be sure to limit the first field to one word. Ex. "MicrosoftOutlook" | "CiscoWebex" and not "Microsoft Outlook" | "Cisco Webex"
+5. Double check that the SwiftSetup and SwiftSetup_Builder folder have been created correctly in /Applications
+6. Double check that there is a Log folder and Setup Assistant folder for your new Setup Assistant in /Applications/SwiftSetup
+7. Double check that there are bash scripts created in /Applications/SwiftSetup_Builder for your new Setup Assistant
 8. Upload the $product_script.bash to your Jamf instance and create an accompanying policy with that script attached. Scope this policy to any machine that will be utilizing this setup assistant *** Be sure to copy down this new policies ID number ***
 9. Adjust the $productplistcreation.bash script to launch your $product_scripts policy ID (Default line 51)
 10. Upload the adjusted $productplistcreation.bash to your Jamf instance and create an accompanying policy with that script attached. Scope this policy to any machine that will be utilizing this setup assistant. Create a custom trigger for this to attach it to your SetupYourMac instance, or find another way to install the trigger PLISTs at enrollment
@@ -105,7 +105,7 @@ You can use the Setup Builder tool to create more than one Setup Assistant and h
 
 If you already have one Setup Assistant created and running smoothly, adding a second one is a relatively pain free process, follow the steps below to get started.
 
-1. Follow steps 1-8 under [Building Setup Assistants](#building-setup-assistants) above to create a second Setup Assistant
+1. Follow steps 1-10 under [Building Setup Assistants](#building-setup-assistants) above to create a second Setup Assistant
 2. Open the $productplistcreation.bash script for your newly created Setup Assistant
 3. Copy the plist variable declaration section from your new script and add it to your original plistcreation script (lines 27 - 88 in the new script)
 4. There should now be a plist_content and touchplist_content variable for all of your Setup Assistants in the original script
