@@ -266,30 +266,10 @@ optConfig="\$dialogBinary \
 "
 
 cleanup(){
-    launchctl unload /Library/LaunchDaemons/${product}Watch.plist
-    sleep 2
     rm -rf /Library/LaunchDaemons/${product}Watch.plist
-    sleep 2
-    if [[ -f /Library/LaunchDaemons/${product}Watch.plist ]]; then
-        updateScriptLog "-- Failed to remove plist file..."
-    else
-        updateScriptLog "-- Plist file removed successfully..."
-    fi
-    launchctl unload /Library/LaunchDaemons/${product}Touch.plist
-    sleep 2
     rm -rf /Library/LaunchDaemons/${product}Touch.plist
-    sleep 2
-    if [[ -f /Library/LaunchDaemons/${product}Touch.plist ]]; then
-        updateScriptLog "-- Failed to remove plist file..."
-    else
-        updateScriptLog "-- Plist file removed successfully..."
-    fi
-     rm -rf \${page1JSONFile}
-    if [[ -f \$page1JSONFile ]]; then
-        updateScriptLog "-- Failed to remove temp file..."
-    else
-        updateScriptLog "-- Removed temp file successfully..."
-    fi
+    rm -rf \${page1JSONFile}
+    launchctl remove ${product}Touch && launchctl remove ${product}Watch
     exit 0
 }
 
