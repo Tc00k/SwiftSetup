@@ -77,7 +77,6 @@ page1button2text="Cancel"
 page1title="SwiftSetup Builder"
 page1Icon=$( defaults read /Library/Preferences/com.jamfsoftware.jamf.plist self_service_app_path )
 page1message="Create a name for the setup assistant, limit to one word"
-productJSON='{ "title" : "Product Name","required" : true,"prompt" : "Outlook, Webex, etc..." },'
 
 ## Page 1 Configuration
 
@@ -109,6 +108,10 @@ answers=$( eval "${dialogBinary} --jsonfile ${builderJSONFile} --json" )
 
 product=$( echo $answers | grep -o '"Product Name" *: *"[^"]*"' | awk -F'"' '{print $4}')
 PID=$( echo $answers | grep -o '"PID Name" *: *"[^"]*"' | awk -F'"' '{print $4}')
+
+if [ "$product" == "" ]; then
+    exit 0
+fi
 
 #############################################
 ##          Folder Structure Creation      ##
