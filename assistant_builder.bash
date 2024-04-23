@@ -76,7 +76,7 @@ page1button1text="Submit"
 page1button2text="Cancel"
 page1title="SwiftSetup Builder"
 page1Icon=$( defaults read /Library/Preferences/com.jamfsoftware.jamf.plist self_service_app_path )
-page1message="Create a name for the setup assistant, limit to one word"
+page1message="Create a name for the setup assistant, limit to one word. The PID Name can be multiple words, pick a name that has no other matches and only shows up when the target application is open"
 
 ## Page 1 Configuration
 
@@ -136,9 +136,9 @@ else
 fi
 
 if [ -d /Applications/SwiftSetup/SetupAssistants/$product"Assistant" ]; then
-    mkdir /Applications/SwiftSetup/SetupAssistants/$product"Assistant"/Resources
-    mkdir /Applications/SwiftSetup/SetupAssistants/$product"Assistant"/Resources/Tmp
-    mkdir /Applications/SwiftSetup/SetupAssistants/$product"Assistant"/Resources/Images
+    mkdir /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources
+    mkdir /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/Tmp
+    mkdir /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/Images
 else
     updateScriptLog "-- Setup Assistant folder does not exist, cannot create dependencies..."
 fi
@@ -149,10 +149,10 @@ fi
 
 activationScript="/Applications/SwiftSetup_Builder/${product}_script.bash"
 plist="/Applications/SwiftSetup_Builder/${product}plistCreation.bash"
-touch_trigger="/Applications/SwiftSetup/SetupAssistants/$product"Assistant"/$product"_Trigger""
+touch_trigger="/Applications/SwiftSetup/SetupAssistants/${product}Assistant/${product}_Trigger"
 touch $touch_trigger
-touch /Applications/SwiftSetup/SetupAssistants/$product"Assistant"/TouchTarget
-chmod +x /Applications/SwiftSetup/SetupAssistants/$product"Assistant"/TouchTarget
+touch /Applications/SwiftSetup/SetupAssistants/${product}Assistant/TouchTarget
+chmod +x /Applications/SwiftSetup/SetupAssistants/${product}Assistant/TouchTarget
 chmod +x $touch_trigger
 
 #############################################
@@ -163,7 +163,26 @@ cat <<EOF > $activationScript
 #!/bin/bash
 
 dialogBinary="/usr/local/bin/dialog"
-page1JSONFile=\$( mktemp -u /Applications/SwiftSetup/SetupAssistants/$product"Assistant"/Resources/tmp/$product"JSONFile".XXX )
+page1JSONFile=\$( mktemp -u /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/tmp/${product}JSONFile.XXX )
+
+##########################################
+## DOCK DETECTION
+##########################################
+
+docked=\$(system_profiler SPPowerDataType | grep "Connected" | awk '{print\$NF}')
+charging=\$(system_profiler SPPowerDataType | grep "ID" | grep -v "appPID" | awk '{print\$NF}')
+
+if [ "\$docked" == "Yes" ] && [ "\$charging" == "0x0000" ]; then
+    result="Docked"
+fi
+if [ "\$docked" == "No" ] && [ "\$charging" == "" ]; then
+    result="Undocked"
+fi
+if [ "\$docked" == "Yes" ] && [ "\$charging" != "0x0000" ]; then
+    result="Charging/Undocked"
+fi
+
+echo "Machine is: \$result"
 
 ##########################################
 ## Logging Function and Variables
@@ -197,6 +216,16 @@ alerttitle="Swift Setup"
 alertmessage="Would you like help setting up $product?"
 alertIcon=\$( defaults read /Library/Preferences/com.jamfsoftware.jamf.plist self_service_app_path )
 
+# Determine width/height based off dock status
+
+if [ "\$result" == "Docked" ]; then
+    page1Width="1000"
+    page1Height="750"
+else
+    page1Width="600"
+    page1Height="450"
+fi
+
 ##########################################
 ## Initial Alert Configuration
 ##########################################
@@ -224,17 +253,17 @@ updateScriptLog "-- Writing Page 1 Data..."
 page1Config='
 {
     "quitkey" : "k",
-    "title" : "Setting up '$product'",
+    "title" : "Setting up ${product}",
     "iconsize" : "150",
     "infobox" : "### Still need help? \n\n### Contact:",
     "ontop" : "false",
     "button1text" : "Close",
     "moveable" : "true",
-    "height" : "750",
-    "width" : "1000",
+    "height" : "'\$page1Height'",
+    "width" : "'\$page1Width'",
     "image" : [
-        {"imagename" : "/Applications/SwiftSetup/SetupAssistants/'$product'Assistant/Resources/Images/Page1.png", "caption" : ""},
-        {"imagename" : "/Applications/SwiftSetup/SetupAssistants/'$product'Assistant/Resources/Images/Page2.png", "caption" : ""}
+        {"imagename" : "/Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/Images/Page1.png", "caption" : ""},
+        {"imagename" : "/Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/Images/Page2.png", "caption" : ""}
     ]
 }
 '
@@ -430,7 +459,7 @@ ${product}Touchplist_content="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 		<string>/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/usr/local/sbin:/opt/local/bin</string>
     </dict>
     <key>Label</key>
-    <string>${product}touch</string>
+    <string>${product}Touch</string>
     <key>ProgramArguments</key>
     <array>
         <string>/bin/sh</string>
@@ -480,9 +509,9 @@ chmod 644 /Library/LaunchDaemons/${product}Watch.plist
 chmod 644 /Library/LaunchDaemons/${product}Touch.plist
 chown root:wheel /Library/LaunchDaemons/${product}Watch.plist
 chown root:wheel /Library/LaunchDaemons/${product}Touch.plist
-sleep 3
+sleep 1
 launchctl load /Library/LaunchDaemons/${product}Watch.plist
-sleep 3
+sleep 1
 launchctl load /Library/LaunchDaemons/${product}Touch.plist
 
 ################################ Finalize ################################
