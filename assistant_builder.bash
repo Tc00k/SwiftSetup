@@ -106,7 +106,7 @@ echo "$mainPageConfig" > "$builderJSONFile"
 
 answers=$( eval "${dialogBinary} --jsonfile ${builderJSONFile} --json" )
 
-product=$( echo $answers | grep -o '"Product Name" *: *"[^"]*"' | awk -F'"' '{print $4}')
+product=$( echo $answers | grep -o '"Product Name" *: *"[^"]*"' | awk -F'"' '{print $4}')🎉
 PID=$( echo $answers | grep -o '"PID Name" *: *"[^"]*"' | awk -F'"' '{print $4}')
 
 if [ "$product" == "" ]; then
@@ -164,6 +164,11 @@ cat <<EOF > $activationScript
 
 dialogBinary="/usr/local/bin/dialog"
 page1JSONFile=\$( mktemp -u /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/tmp/${product}JSONFile.XXX )
+if [ -f "/var/tmp/declined.txt" ]; then
+	declinedPrevious="true"
+else
+	declinedPrevious="false"
+fi
 
 ##########################################
 ## DOCK DETECTION
@@ -334,25 +339,29 @@ case \$? in
     updateScriptLog "-- User pressed \$alertbutton2text --"
     updateScriptLog "-- User has opted out of Setup Assistant..."
     updateScriptLog "-- Running Opt screen..."
-    eval "\${optConfig}"
-    case \$? in
-        ## Button 1 Return
-        0)
-        updateScriptLog "-- User pressed \$optbutton1text --"
-        updateScriptLog "-- Running Cleanup..."
+    if [ "\$declinedPrevious" == "false" ]; then
+        eval "\${optConfig}"
+        touch "/var/tmp/declined.txt"
+        case \$? in
+            ## Button 1 Return
+            0)
+            updateScriptLog "-- User pressed \$optbutton1text --"
+            updateScriptLog "-- Running Cleanup..."
+            cleanup
+            exit 0
+            ;;
+            ## Button 2 Return
+            2)
+            updateScriptLog "--User pressed \$optbutton2text --"
+            updateScriptLog "-- Launching Self Service..."
+            open "/Applications/Self Service.app"
+            updateScriptLog "-- Running cleanup and closing..."
+            cleanup
+            exit 0
+        esac
+    else
         cleanup
-        exit 0
-        ;;
-        ## Button 2 Return
-        2)
-        updateScriptLog "--User pressed \$optbutton2text --"
-        updateScriptLog "-- Launching Self Service..."
-        open "/Applications/Self Service.app"
-        updateScriptLog "-- Running cleanup and closing..."
-        cleanup
-        exit 0
-    esac
-    cleanup
+    fi
     ;;
 esac
 
