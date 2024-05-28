@@ -106,7 +106,7 @@ echo "$mainPageConfig" > "$builderJSONFile"
 
 answers=$( eval "${dialogBinary} --jsonfile ${builderJSONFile} --json" )
 
-product=$( echo $answers | grep -o '"Product Name" *: *"[^"]*"' | awk -F'"' '{print $4}')🎉
+product=$( echo $answers | grep -o '"Product Name" *: *"[^"]*"' | awk -F'"' '{print $4}')
 PID=$( echo $answers | grep -o '"PID Name" *: *"[^"]*"' | awk -F'"' '{print $4}')
 
 if [ "$product" == "" ]; then
