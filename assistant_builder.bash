@@ -554,6 +554,8 @@ cat <<EOF > $touch_trigger
 application_Name="$product"
 file_Path="/Applications/SwiftSetup/SetupAssistants/$product"Assistant"/TouchTarget"
 is_It_Running=\$( pgrep -l "$PID" )
+ping -c 1 8.8.8.8 > /dev/null 2>&1
+internetConnection=\$?
 
 ## Script log location for local runs since I won't have JAMF logs available.
 scriptLog="/Applications/SwiftSetup/Logs/$product/$product"_Trigger.log""
@@ -581,7 +583,7 @@ if [[ ! -f "\${scriptLog}" ]]; then
     touch "\${scriptLog}"
 fi
 
-if [ "\$is_It_Running" != "" ]; then
+if [ "\$is_It_Running" != "" ] && [ "\$internetConnection" -eq 0 ]; then
     touch "\$file_Path"
     updateScriptLog "$product found to be running, triggering Daemon..."
 else
