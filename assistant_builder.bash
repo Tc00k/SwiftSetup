@@ -127,15 +127,15 @@ fi
 if [ $product = "" ]; then
     updateScriptLog "-- Product Name field cannot be empty..."
 else
-    if [ -d /Applications/SwiftSetup/SetupAssistants/$product"Assistant" ]; then
-        updateScriptLog "-- /Applications/SwiftSetup/SetupAssistants/$product"assistant" already exists..."
+    if [ -d /Applications/SwiftSetup/SetupAssistants/${product}Assistant ]; then
+        updateScriptLog "-- /Applications/SwiftSetup/SetupAssistants/${product}assistant already exists..."
     else
         updateScriptLog "-- Creating Setup Assistant Directory..."
-        mkdir /Applications/SwiftSetup/SetupAssistants/$product"assistant"
+        mkdir /Applications/SwiftSetup/SetupAssistants/${product}assistant
     fi
 fi
 
-if [ -d /Applications/SwiftSetup/SetupAssistants/$product"Assistant" ]; then
+if [ -d /Applications/SwiftSetup/SetupAssistants/${product}Assistant ]; then
     mkdir /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources
     mkdir /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/Tmp
     mkdir /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/Images
@@ -162,6 +162,7 @@ chmod +x $touch_trigger
 cat <<EOF > $activationScript
 #!/bin/bash
 
+launchctl remove ${product}Touch
 dialogBinary="/usr/local/bin/dialog"
 page1JSONFile=\$( mktemp -u /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/tmp/${product}JSONFile.XXX )
 if [ -f "/var/tmp/declined.txt" ]; then
@@ -306,7 +307,7 @@ cleanup(){
     rm -rf /Library/LaunchDaemons/${product}Watch.plist
     rm -rf /Library/LaunchDaemons/${product}Touch.plist
     rm -rf \${page1JSONFile}
-    launchctl remove ${product}Touch && launchctl remove ${product}Watch
+    launchctl remove ${product}Watch
     exit 0
 }
 
@@ -552,13 +553,14 @@ cat <<EOF > $touch_trigger
 
 ## Set the variables used to track $product launch status
 application_Name="$product"
-file_Path="/Applications/SwiftSetup/SetupAssistants/$product"Assistant"/TouchTarget"
+file_Path="/Applications/SwiftSetup/SetupAssistants/${product}Assistant/TouchTarget"
+isItBlocked=\$( pgrep -l "Dialog")
 is_It_Running=\$( pgrep -l "$PID" )
 ping -c 1 8.8.8.8 > /dev/null 2>&1
 internetConnection=\$?
 
 ## Script log location for local runs since I won't have JAMF logs available.
-scriptLog="/Applications/SwiftSetup/Logs/$product/$product"_Trigger.log""
+scriptLog="/Applications/SwiftSetup/Logs/${product}/${product}_Trigger.log"
 
 ## Function for updating the script log
 function updateScriptLog() {
@@ -583,10 +585,12 @@ if [[ ! -f "\${scriptLog}" ]]; then
     touch "\${scriptLog}"
 fi
 
-if [ "\$is_It_Running" != "" ] && [ "\$internetConnection" -eq 0 ]; then
+if [ "\$is_It_Running" != "" ] && [ "\$internetConnection" -eq 0 ] && [ "\$isItBlocked" == "" ]; then
     touch "\$file_Path"
     updateScriptLog "$product found to be running, triggering Daemon..."
-else
+elif [ "\$is_It_Running" != "" ] && [ "\$isItBlocked" != "" ]; then
+    updateScriptLog "$product is running, waiting for previous assistant to close..."
+elif [ "\$is_It_Running" == "" ]; then
     updateScriptLog "$product is not running..."
 fi
 EOF
