@@ -162,6 +162,23 @@ chmod +x $touch_trigger
 cat <<EOF > $activationScript
 #!/bin/bash
 
+###########################################
+## Check to see if Dialog is already running            
+###########################################
+
+dialogCheck() {
+    isItBlocked=\$( pgrep -l "Dialog")
+    if [ "\$isItBlocked" != "" ]; then
+        echo "Dialog is blocked, waiting..."
+        sleep 2
+        dialogCheck
+    else
+        echo "Dialog is unblocked, continuing..."
+    fi
+}
+
+dialogCheck
+
 launchctl remove ${product}Touch
 dialogBinary="/usr/local/bin/dialog"
 page1JSONFile=\$( mktemp -u /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/tmp/${product}JSONFile.XXX )
