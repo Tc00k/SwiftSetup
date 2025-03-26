@@ -166,6 +166,8 @@ cat <<EOF > $activationScript
 ## Check to see if Dialog is already running            
 ###########################################
 
+## Comment out this dialogCheck if you are launching through Setup Your Mac or it will wait for SYM to finish before launching a Setup Assistant
+
 dialogCheck() {
     isItBlocked=\$( pgrep -l "Dialog")
     if [ "\$isItBlocked" != "" ]; then
@@ -567,6 +569,8 @@ EOF
 
 cat <<EOF > $touch_trigger
 #!/bin/bash
+
+## Comment out line 578 and remove variable isItBlocked if you are launching through Setup Your Mac or it will wait for SYM to finish before launching a Setup Assistant
 
 ## Set the variables used to track $product launch status
 application_Name="$product"
