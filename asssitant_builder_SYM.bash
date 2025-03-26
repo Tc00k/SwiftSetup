@@ -166,19 +166,6 @@ cat <<EOF > $activationScript
 ## Check to see if Dialog is already running            
 ###########################################
 
-dialogCheck() {
-    isItBlocked=\$( pgrep -l "Dialog")
-    if [ "\$isItBlocked" != "" ]; then
-        echo "Dialog is blocked, waiting..."
-        sleep 2
-        dialogCheck
-    else
-        echo "Dialog is unblocked, continuing..."
-    fi
-}
-
-dialogCheck
-
 launchctl remove ${product}Touch
 dialogBinary="/usr/local/bin/dialog"
 page1JSONFile=\$( mktemp -u /Applications/SwiftSetup/SetupAssistants/${product}Assistant/Resources/tmp/${product}JSONFile.XXX )
@@ -571,7 +558,6 @@ cat <<EOF > $touch_trigger
 ## Set the variables used to track $product launch status
 application_Name="$product"
 file_Path="/Applications/SwiftSetup/SetupAssistants/${product}Assistant/TouchTarget"
-isItBlocked=\$( pgrep -l "Dialog")
 is_It_Running=\$( pgrep -l "$PID" )
 ping -c 1 8.8.8.8 > /dev/null 2>&1
 internetConnection=\$?
@@ -602,11 +588,9 @@ if [[ ! -f "\${scriptLog}" ]]; then
     touch "\${scriptLog}"
 fi
 
-if [ "\$is_It_Running" != "" ] && [ "\$internetConnection" -eq 0 ] && [ "\$isItBlocked" == "" ]; then
+if [ "\$is_It_Running" != "" ] && [ "\$internetConnection" -eq 0 ]; then
     touch "\$file_Path"
     updateScriptLog "$product found to be running, triggering Daemon..."
-elif [ "\$is_It_Running" != "" ] && [ "\$isItBlocked" != "" ]; then
-    updateScriptLog "$product is running, waiting for previous assistant to close..."
 elif [ "\$is_It_Running" == "" ]; then
     updateScriptLog "$product is not running..."
 fi
