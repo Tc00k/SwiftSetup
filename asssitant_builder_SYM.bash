@@ -409,7 +409,7 @@ scriptLog="/Applications/SwiftSetup/Logs/Core/PLIST_CREATION.log"
 
 ## Function for updating the script log
 function updateScriptLog() {
-    echo -e "\$( date +%Y-%m-%d\ %H:%M:S ) -\${1}" | tee -a "\${scriptLog}" 
+    echo -e "\$( date +%Y-%m-%d\ %H:%M:%S ) -\${1}" | tee -a "\${scriptLog}" 
 }
 
 ## Create log file if not found
